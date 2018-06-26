@@ -89,7 +89,10 @@ class EngineSetup:
     return self.getFuelPerHour()*self.nr/3600.0
 
   def __repr__(self):
-    return "{} x [{} EP ({} MSP) missile engine with multiplier {}, Fuel/EPH={}, Fuel/Hour={}]".format(self.nr, self.ep, self.msp, self.multiplier, self.fuelPerEPH, self.getFuelPerHour())
+    nr = ""
+    if self.nr > 1:
+      nr = "{} x ".format(self.nr)
+    return "{}EP = {}, MSP = {}, multiplier = {}, Fuel/EPH = {}, Fuel/Hour = {}".format(nr, round(self.ep,4), round(self.msp,4), round(self.multiplier,2), round(self.fuelPerEPH,2), round(self.getFuelPerHour(),2))
     
   def getTotalEngineMsp(self):
     return self.msp*self.nr
@@ -117,8 +120,11 @@ class Missile:
     self.excessMsp = excessMsp
 
   def __repr__(self):
-    return "Size={} (WH={}, Fuel={}, Agility={}, Engine={}, Excess={}), Speed={}, Damage={}, Range={} mkm, 10000km/s Cth={}, Engine={}".format(
-      self.getSize(), round(self.warheadMsp,2), round(self.fuelMsp,2), round(self.agilityMsp,2), round(self.engineSetup.getTotalEngineMsp(),2), self.excessMsp, round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), self.getCth(10000), self.engineSetup)
+    sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp,2), round(self.fuelMsp,2), round(self.agilityMsp,2), round(self.engineSetup.getTotalEngineMsp(),2), self.excessMsp)
+    performanceStr = "  Speed = {} km/s, Damage = {}, Range = {} mkm, MR = {}, Cth = {}% / {}% / {}%".format(round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), round(self.getMr()), round(self.getCth(3000),2), round(self.getCth(5000),2), round(self.getCth(10000),2))
+    engineStr = "  missile engine: {}".format(self.engineSetup)
+    finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr
+    return finalStr
     
   def getSize(self):
     size = self.warheadMsp + self.engineSetup.getTotalEngineMsp() + self.fuelMsp + self.agilityMsp + self.excessMsp
@@ -141,11 +147,11 @@ class Missile:
     return round(range,6)
 
   def getMr(self):
-    mr = round(self.technologyContext.agilityPerMsp*self.agilityMsp/self.getSize())
+    mr = 10 + round(self.technologyContext.agilityPerMsp*self.agilityMsp/self.getSize())
     return mr
 
-  def getCth(self, its):
-    cth = self.getSpeed()/its*(10+self.getMr())
+  def getCth(self, targetSpeed):
+    cth = self.getSpeed()/targetSpeed*self.getMr()
     return round(cth,6)
 
 
@@ -166,15 +172,19 @@ class MissileOptimization:
     else:
       self._minEngineMsp = 10000000.0
     self._allMr = self._getAllMr()
-    print("Engine candidates: {}".format(len(self._allEngines)))
-    print("Warhead candidates: {}".format(len(self._allWarhead)))
-    print("MR candidates: {0}".format(len(self._allMr)))
+    self._allMissiles = None
+
+  def __repr__(self):
+    outputStr = "Engine candidates: {}".format(len(self._allEngines)) + "\n"
+    outputStr += "Warhead candidates: {}".format(len(self._allWarhead)) + "\n"
+    outputStr += "MR candidates: {0}".format(len(self._allMr)) + "\n"
+    return outputStr
 
   def _getAllEngineSetup(self):
     maxMsp = self.calculationContext.size - self.calculationContext.minExcessSize - self._minWarheadMsp
     engineSetups = []
-    for msp in auroraData.engineMsps:
-      for multiplier in auroraData.engineMultipliers:
+    for msp in self.auroraData.engineMsps:
+      for multiplier in self.auroraData.engineMultipliers:
         if self._checkMultiplier(multiplier):
           maxNr = math.floor(maxMsp*1.0/msp)
           if not self.calculationContext.maxNr is None:
@@ -226,19 +236,21 @@ class MissileOptimization:
     return agilityMsps
 
   def getAllMissiles(self):
-    missiles = []
-    remainingMsp = self.calculationContext.size - self.calculationContext.minExcessSize
-    for warhead in self._allWarhead:
-      remainingMspAfterWarhead = remainingMsp - warhead
-      for engineSetup in [e for e in self._allEngines if e.getTotalEngineMsp() <= remainingMspAfterWarhead]:
-        remainingMspAfterEngines = remainingMspAfterWarhead - engineSetup.getTotalEngineMsp()
-        for agility in [a for a in self._allMr if a <= remainingMspAfterEngines]:
-          fuelMsp = remainingMspAfterEngines - agility
-          if (fuelMsp > 0):
-             missile = Missile(self.technologyContext, warhead, fuelMsp, engineSetup, agility, self.calculationContext.minExcessSize)
-             if self._checkMissile(missile):
-               missiles.append(missile)
-    return missiles
+    if self._allMissiles is None:
+      missiles = []
+      remainingMsp = self.calculationContext.size - self.calculationContext.minExcessSize
+      for warhead in self._allWarhead:
+        remainingMspAfterWarhead = remainingMsp - warhead
+        for engineSetup in [e for e in self._allEngines if e.getTotalEngineMsp() <= remainingMspAfterWarhead]:
+          remainingMspAfterEngines = remainingMspAfterWarhead - engineSetup.getTotalEngineMsp()
+          for agility in [a for a in self._allMr if a <= remainingMspAfterEngines]:
+            fuelMsp = remainingMspAfterEngines - agility
+            if (fuelMsp > 0):
+               missile = Missile(self.technologyContext, warhead, fuelMsp, engineSetup, agility, self.calculationContext.minExcessSize)
+               if self._checkMissile(missile):
+                 missiles.append(missile)
+      self._allMissiles = missiles
+    return self._allMissiles
 
   def _checkMissile(self, missile):
     size = missile.getSize()
@@ -261,42 +273,59 @@ class MissileOptimization:
     if not calcCtx.minCth is None and missile.getCth(calcCtx.intendedTargetSpeed) < calcCtx.minCth:
       return False
     return True
-  
 
-auroraData = AuroraData()
-techContext = TechnologyContext()
-techContext.damagePerMsp = 20
-techContext.agilityPerMsp = 160
-techContext.EPPerHs = 50
-techContext.fuelConsumption = 0.2
-#techContext.MinPowerFactor = 0.1
-#techContext.MaxPowerFactor = 6
+  def getTopMissiles(self, sortFn = lambda m:m.getDamage(), reverse=True, top=5):
+    allMissiles = self.getAllMissiles()
+    sortedMissiles = sorted(allMissiles, key=sortFn, reverse=reverse)
+    return sortedMissiles[:top]
 
-calcContext = CalculationContext()
-#calcContext.size = 1
-#calcContext.minDamage = 1
-#calcContext.maxDamage = 1
-#calcContext.minSpeed = 50000
-#calcContext.maxSpeed = 1000000
-#calcContext.minRange = 20000000
-#calcContext.minCth = 1000
-calcContext.size = 12
-calcContext.minExcessSize = 1.0
-calcContext.minDamage = 80
-calcContext.maxDamage = 100
-calcContext.minSpeed = 50000
-calcContext.maxSpeed = 1000000
-calcContext.minRange = 2000000000
-calcContext.minCth = 100
+  def printTopMissiles(self, sortFn = lambda m:m.getDamage(), reverse=True, top=5):
+    candidates = len(self.getAllMissiles())
+    topMissiles = self.getTopMissiles(sortFn=sortFn, reverse=reverse, top=top)
+    outputStr = "{} candidates:\n\n".format(candidates)
+    for m in topMissiles:
+      outputStr += "{}\n\n".format(m)
+    return outputStr
 
-missileOpt = MissileOptimization(auroraData, techContext, calcContext)
-allMissiles = missileOpt.getAllMissiles()
-#sortedMissiles=sorted(allMissiles, key=lambda m:m.getCth(10000), reverse=True)
-sortedMissiles=sorted(allMissiles, key=lambda m:m.getDamage(), reverse=True)
-print("Final candidates: {}".format(len(sortedMissiles)))
-print(sortedMissiles[0])
-print(sortedMissiles[1])
-print(sortedMissiles[2])
-print(sortedMissiles[3])
-print(sortedMissiles[4])
-print(sortedMissiles[5])
+
+
+# EXAMPLE
+
+def getExampleOptimizer():
+  auroraData = AuroraData()
+  techContext = TechnologyContext()
+  techContext.damagePerMsp = 20
+  techContext.agilityPerMsp = 160
+  techContext.EPPerHs = 50
+  techContext.fuelConsumption = 0.2
+  techContext.MinPowerFactor = 0.1
+  techContext.MaxPowerFactor = 6
+
+  calcContext = CalculationContext()
+  #calcContext.size = 1
+  #calcContext.minDamage = 1
+  #calcContext.maxDamage = 1
+  #calcContext.minSpeed = 50000
+  #calcContext.maxSpeed = 1000000
+  #calcContext.minRange = 20000000
+  #calcContext.minCth = 1000
+  calcContext.size = 12
+  calcContext.minExcessSize = 1.0
+  calcContext.minDamage = 80
+  calcContext.maxDamage = 81
+  calcContext.minSpeed = 50000
+  calcContext.maxSpeed = 1000000
+  calcContext.minRange = 2000000000
+  calcContext.minCth = 100
+
+  missileOpt = MissileOptimization(auroraData, techContext, calcContext)
+  return missileOpt
+
+
+example = getExampleOptimizer()
+print(example)
+
+#In case missiles should be sorted by chance to hit (descending):
+#topMissiles = example.printTopMissiles(lambda m:m.getCth(10000))
+topMissiles = example.printTopMissiles()
+print(topMissiles)
