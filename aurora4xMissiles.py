@@ -19,7 +19,6 @@ class AuroraData:
       "Advanced Antimatter"         : 24.0,
       "Gravitonic"                  : 30.0
     }
-    self.warheadTech = {}
     self.engineTech = {
       "Conventional"                : 0.2,
       "Nuclear Thermal"             : 5.0,
