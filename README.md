@@ -1,19 +1,20 @@
 # aurora4xMissiles
 Aurora4x missile optimizer
 
-The optimizer is quite slow unless the number of choices are reduced by specifying
-boundaries for e.g. damage and/or speed.
-
-Also the results are not always correct/optimal
-(due to rounding issues): The internal calculation uses values which it assumes to be optimal
-(e.g. an agility value just high enough for the MR. Because of rounding
-issues the final result could be just _below_ that value though.
-Please help in case you know an easy way to fix/improve this...
-
-Nevertheless I find it quite usefull...
+The optimizer will try to find all possible missile designs satisfying the
+given restrictions. It is quite slow unless the number of choices is reduced
+enough by specifying enough boundary conditions (e.g. damage, speed, cth).
 
 To run it online e.g. copy paste the content of aurora4xMissiles.py in
 repl.it (for Python3) and modify the content to your situation...
+
+The main optimizer class is `MissileOptimization`. It requires `AuroraData`
+(basic game data), `TechnologyContext` (research level relevant for missiles)
+and `CalculationContext` (boundary conditions). The top 5 optimized results 
+then be fetched with the command `missileOptimization.printTopMissiles()`.
+Optionally a sorting parameter can be specified (by default it's damage then cth).
+
+For more details please see the source code...
 
 Example:
 
@@ -50,28 +51,27 @@ print(topMissiles)
 gives:
 
 ```
-50 candidates:
-
-Size = 12.0: WH = 4.05, Fuel = 1.6325, Agility = 0.7875, Engine = 4.53, Excess = 1.0
-  Speed = 50019 km/s, Damage = 81, Range = 2002 mkm, MR = 20, Cth = 333.4583% / 200.075% / 100.0375%
-  missile engine: EP = 30.0113, MSP = 4.53, multiplier = 2.65, Fuel/EPH = 12.2291, Fuel/Hour = 367.012
-
-Size = 12.0: WH = 4.05, Fuel = 1.5425, Agility = 0.7875, Engine = 4.62, Excess = 1.0
-  Speed = 50050 km/s, Damage = 81, Range = 2011 mkm, MR = 20, Cth = 333.6667% / 200.2% / 100.1%
-  missile engine: EP = 30.03, MSP = 4.62, multiplier = 2.6, Fuel/EPH = 11.5048, Fuel/Hour = 345.4894
+244 candidates:
 
 Size = 12.0: WH = 4.05, Fuel = 1.5325, Agility = 0.7875, Engine = 4.63, Excess = 1.0
-  Speed = 50158 km/s, Damage = 81, Range = 2001 mkm, MR = 20, Cth = 334.3889% / 200.6333% / 100.3167%
+  Speed = 50158 km/s, Damage = 81, Range = 2001 mkm, MR = 21, Cth = 351.1083% / 210.665% / 105.3325%
   missile engine: EP = 30.095, MSP = 4.63, multiplier = 2.6, Fuel/EPH = 11.4878, Fuel/Hour = 345.7263
 
-Size = 12.0: WH = 4.05, Fuel = 1.4525, Agility = 0.7875, Engine = 4.71, Excess = 1.0
-  Speed = 50044 km/s, Damage = 81, Range = 2014 mkm, MR = 20, Cth = 333.625% / 200.175% / 100.0875%
-  missile engine: EP = 30.0262, MSP = 4.71, multiplier = 2.55, Fuel/EPH = 10.8162, Fuel/Hour = 324.7692
-
 Size = 12.0: WH = 4.05, Fuel = 1.4425, Agility = 0.7875, Engine = 4.72, Excess = 1.0
-  Speed = 50150 km/s, Damage = 81, Range = 2003 mkm, MR = 20, Cth = 334.3333% / 200.6% / 100.3%
+  Speed = 50150 km/s, Damage = 81, Range = 2003 mkm, MR = 21, Cth = 351.05% / 210.63% / 105.315%
   missile engine: EP = 30.09, MSP = 4.72, multiplier = 2.55, Fuel/EPH = 10.8005, Fuel/Hour = 324.9876
 
+Size = 12.0: WH = 4.05, Fuel = 1.5425, Agility = 0.7875, Engine = 4.62, Excess = 1.0
+  Speed = 50050 km/s, Damage = 81, Range = 2011 mkm, MR = 21, Cth = 350.35% / 210.21% / 105.105%
+  missile engine: EP = 30.03, MSP = 4.62, multiplier = 2.6, Fuel/EPH = 11.5048, Fuel/Hour = 345.4894
+
+Size = 12.0: WH = 4.05, Fuel = 1.4525, Agility = 0.7875, Engine = 4.71, Excess = 1.0
+  Speed = 50044 km/s, Damage = 81, Range = 2014 mkm, MR = 21, Cth = 350.3062% / 210.1838% / 105.0919%
+  missile engine: EP = 30.0262, MSP = 4.71, multiplier = 2.55, Fuel/EPH = 10.8162, Fuel/Hour = 324.7692
+
+Size = 12.0: WH = 4.05, Fuel = 1.6325, Agility = 0.7875, Engine = 4.53, Excess = 1.0
+  Speed = 50019 km/s, Damage = 81, Range = 2002 mkm, MR = 21, Cth = 350.1313% / 210.0788% / 105.0394%
+  missile engine: EP = 30.0113, MSP = 4.53, multiplier = 2.65, Fuel/EPH = 12.2291, Fuel/Hour = 367.012
 ```
 
 The final candidates can be sorted according to any missile criteria
