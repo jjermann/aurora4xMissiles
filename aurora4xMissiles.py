@@ -92,7 +92,7 @@ class EngineSetup:
     nr = ""
     if self.nr > 1:
       nr = "{} x ".format(self.nr)
-    return "{}EP = {}, MSP = {}, multiplier = {}, Fuel/EPH = {}, Fuel/Hour = {}".format(nr, round(self.ep,4), round(self.msp,4), round(self.multiplier,2), round(self.fuelPerEPH,2), round(self.getFuelPerHour(),2))
+    return "{}EP = {}, MSP = {}, multiplier = {}, Fuel/EPH = {}, Fuel/Hour = {}".format(nr, round(self.ep,4), round(self.msp,4), round(self.multiplier,4), round(self.fuelPerEPH,4), round(self.getFuelPerHour(),4))
     
   def getTotalEngineMsp(self):
     return self.msp*self.nr
@@ -120,8 +120,8 @@ class Missile:
     self.excessMsp = excessMsp
 
   def __repr__(self):
-    sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp,2), round(self.fuelMsp,2), round(self.agilityMsp,2), round(self.engineSetup.getTotalEngineMsp(),2), self.excessMsp)
-    performanceStr = "  Speed = {} km/s, Damage = {}, Range = {} mkm, MR = {}, Cth = {}% / {}% / {}%".format(round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), round(self.getMr()), round(self.getCth(3000),2), round(self.getCth(5000),2), round(self.getCth(10000),2))
+    sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp,4), round(self.fuelMsp,4), round(self.agilityMsp,4), round(self.engineSetup.getTotalEngineMsp(),4), self.excessMsp)
+    performanceStr = "  Speed = {} km/s, Damage = {}, Range = {} mkm, MR = {}, Cth = {}% / {}% / {}%".format(round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), round(self.getMr()), round(self.getCth(3000),4), round(self.getCth(5000),4), round(self.getCth(10000),4))
     engineStr = "  missile engine: {}".format(self.engineSetup)
     finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr
     return finalStr
