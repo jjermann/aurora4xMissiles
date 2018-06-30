@@ -53,24 +53,24 @@ gives:
 ```
 244 candidates:
 
-Size = 12.0: WH = 4.05, Fuel = 1.5325, Agility = 0.7875, Engine = 4.63, Excess = 1.0
-  Speed = 50158 km/s, Damage = 81, Range = 2001 mkm, MR = 21, Cth = 351.1083% / 210.665% / 105.3325%
+Size = 12.0: WH = 4.05, Fuel = 1.5324, Agility = 0.7876, Engine = 4.63, Excess = 1.0
+  Speed = 50158 km/s, Damage = 81, Range = 2001 mkm, Fuel = 3830.9375, MR = 21, Cth = 351.1083% / 210.665% / 105.3325%
   missile engine: EP = 30.095, MSP = 4.63, multiplier = 2.6, Fuel/EPH = 11.4878, Fuel/Hour = 345.7263
 
-Size = 12.0: WH = 4.05, Fuel = 1.4425, Agility = 0.7875, Engine = 4.72, Excess = 1.0
-  Speed = 50150 km/s, Damage = 81, Range = 2003 mkm, MR = 21, Cth = 351.05% / 210.63% / 105.315%
+Size = 12.0: WH = 4.05, Fuel = 1.4424, Agility = 0.7876, Engine = 4.72, Excess = 1.0
+  Speed = 50150 km/s, Damage = 81, Range = 2003 mkm, Fuel = 3605.9375, MR = 21, Cth = 351.05% / 210.63% / 105.315%
   missile engine: EP = 30.09, MSP = 4.72, multiplier = 2.55, Fuel/EPH = 10.8005, Fuel/Hour = 324.9876
 
-Size = 12.0: WH = 4.05, Fuel = 1.5425, Agility = 0.7875, Engine = 4.62, Excess = 1.0
-  Speed = 50050 km/s, Damage = 81, Range = 2011 mkm, MR = 21, Cth = 350.35% / 210.21% / 105.105%
+Size = 12.0: WH = 4.05, Fuel = 1.5424, Agility = 0.7876, Engine = 4.62, Excess = 1.0
+  Speed = 50050 km/s, Damage = 81, Range = 2011 mkm, Fuel = 3855.9375, MR = 21, Cth = 350.35% / 210.21% / 105.105%
   missile engine: EP = 30.03, MSP = 4.62, multiplier = 2.6, Fuel/EPH = 11.5048, Fuel/Hour = 345.4894
 
-Size = 12.0: WH = 4.05, Fuel = 1.4525, Agility = 0.7875, Engine = 4.71, Excess = 1.0
-  Speed = 50044 km/s, Damage = 81, Range = 2014 mkm, MR = 21, Cth = 350.3062% / 210.1838% / 105.0919%
+Size = 12.0: WH = 4.05, Fuel = 1.4524, Agility = 0.7876, Engine = 4.71, Excess = 1.0
+  Speed = 50044 km/s, Damage = 81, Range = 2014 mkm, Fuel = 3630.9375, MR = 21, Cth = 350.3062% / 210.1838% / 105.0919%
   missile engine: EP = 30.0262, MSP = 4.71, multiplier = 2.55, Fuel/EPH = 10.8162, Fuel/Hour = 324.7692
 
-Size = 12.0: WH = 4.05, Fuel = 1.6325, Agility = 0.7875, Engine = 4.53, Excess = 1.0
-  Speed = 50019 km/s, Damage = 81, Range = 2002 mkm, MR = 21, Cth = 350.1313% / 210.0788% / 105.0394%
+Size = 12.0: WH = 4.05, Fuel = 1.6324, Agility = 0.7876, Engine = 4.53, Excess = 1.0
+  Speed = 50019 km/s, Damage = 81, Range = 2002 mkm, Fuel = 4080.9375, MR = 21, Cth = 350.1313% / 210.0788% / 105.0394%
   missile engine: EP = 30.0113, MSP = 4.53, multiplier = 2.65, Fuel/EPH = 12.2291, Fuel/Hour = 367.012
 ```
 

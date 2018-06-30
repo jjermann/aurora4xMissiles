@@ -118,23 +118,23 @@ class Missile:
     self.engineSetup = engineSetup
     self.agilityMsp = agilityMsp
     self.excessMsp = excessMsp
-    self._prec = 4
-    self._highPrec = 6
+    self._dispPrec = 4
+    self._prec = 5
 
   def __repr__(self):
-    sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp, self._prec), round(self.fuelMsp, self._prec), round(self.agilityMsp, self._prec), round(self.engineSetup.getTotalEngineMsp(), self._prec), self.excessMsp)
-    performanceStr = "  Speed = {} km/s, Damage = {}, Range = {} mkm, MR = {}, Cth = {}% / {}% / {}%".format(round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), self.getMr(), round(self.getCth(3000), self._prec), round(self.getCth(5000), self._prec), round(self.getCth(10000), self._prec))
+    sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp, self._dispPrec), round(self.fuelMsp, self._dispPrec), round(self.agilityMsp, self._dispPrec), round(self.engineSetup.getTotalEngineMsp(), self._dispPrec), self.excessMsp)
+    performanceStr = "  Speed = {} km/s, Damage = {}, Range = {} mkm, Fuel = {}, MR = {}, Cth = {}% / {}% / {}%".format(round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), round(self.getFuel(), self._dispPrec), self.getMr(), round(self.getCth(3000), self._dispPrec), round(self.getCth(5000), self._dispPrec), round(self.getCth(10000), self._dispPrec))
     engineStr = "  missile engine: {}".format(self.engineSetup)
     finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr
     return finalStr
     
   def getSize(self):
     size = self.warheadMsp + self.engineSetup.getTotalEngineMsp() + self.fuelMsp + self.agilityMsp + self.excessMsp
-    return round(size, self._highPrec)
+    return round(size, self._prec)
 
   def getSpeed(self):
     speed = self.engineSetup.getSpeed(self.getSize())
-    return round(speed, self._highPrec)
+    return round(speed, self._prec)
   
   def getDamage(self):
     damage = math.floor(self.technologyContext.damagePerMsp*self.warheadMsp)
@@ -142,11 +142,11 @@ class Missile:
 
   def getFuel(self):
     fuel = self.fuelMsp*2500
-    return round(fuel, self._highPrec)
+    return round(fuel, self._prec)
 
   def getRange(self):
     range = self.getFuel()*self.getSpeed()*1.0/self.engineSetup.getTotalFuelPerSecond()
-    return round(range, self._highPrec)
+    return round(range, self._prec)
 
   def getMr(self):
     mr = 10 + round(self.technologyContext.agilityPerMsp*self.agilityMsp/self.getSize())
@@ -154,7 +154,7 @@ class Missile:
 
   def getCth(self, targetSpeed):
     cth = self.getSpeed()/targetSpeed*self.getMr()
-    return round(cth, self._highPrec)
+    return round(cth, self._prec)
 
 
 class MissileOptimization:
@@ -226,7 +226,7 @@ class MissileOptimization:
     else:
       maxDmg = damageSteps
     
-    minDmgStep = 10**(-self._prec)*mspPerDamage
+    minDmgStep = 10*10**(-self._prec)*mspPerDamage
     warheadMsps = [minDmgStep + dmg*mspPerDamage for dmg in range(minDmg, maxDmg+1)]
     return warheadMsps
 
@@ -235,7 +235,7 @@ class MissileOptimization:
     agilityPerMsp = self.technologyContext.agilityPerMsp
     mrPerMsp = agilityPerMsp*1.0/self.calculationContext.size
     mspPerMr = 1.0/mrPerMsp
-    minAgilityStep = 10**(-self._prec)*mspPerMr
+    minAgilityStep = 10*10**(-self._prec)*mspPerMr
     initialMspForMr = minAgilityStep + 0.5*self.calculationContext.size/agilityPerMsp
     remainingMsp = maxMsp-initialMspForMr
     mrSteps = math.floor(remainingMsp / mspPerMr)
