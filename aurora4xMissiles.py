@@ -39,7 +39,7 @@ class AuroraData:
     self.maxMultiplierTech = [1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]
     self.engineMultipliers = [ intm*1.0/20 for intm in range(2, 121) ]
     self.engineMsps = [ intmsp*1.0/100 for intmsp in range(10, 500) ]
-  
+
 
 class TechnologyContext:
   def __init__(self):
@@ -93,12 +93,16 @@ class EngineSetup:
     if self.nr > 1:
       nr = "{} x ".format(self.nr)
     return "{}EP = {}, MSP = {}, multiplier = {}, Fuel/EPH = {}, Fuel/Hour = {}".format(nr, round(self.ep, self._dispPrec), round(self.msp, self._dispPrec), round(self.multiplier, self._dispPrec), round(self.fuelPerEPH, self._dispPrec), round(self.getFuelPerHour(), self._dispPrec))
-    
+
   def getTotalEngineMsp(self):
     return self.msp*self.nr
 
   def getSpeed(self, totalMsp):
     return 1000*self.ep*self.nr*20.0/totalMsp
+
+  def getRoundedSpeed(self, totalMsp):
+    speed = self.getSpeed(totalMsp)
+    return round(round(speed, -2))
 
   #range is in km
   def getRequiredFuelMsp(self, totalMsp, desiredRange):
@@ -123,11 +127,11 @@ class Missile:
 
   def __repr__(self):
     sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp, self._dispPrec), round(self.fuelMsp, self._dispPrec), round(self.agilityMsp, self._dispPrec), round(self.engineSetup.getTotalEngineMsp(), self._dispPrec), self.excessMsp)
-    performanceStr = "  Speed = {} km/s, Damage = {}, Range = {} mkm, Fuel = {}, MR = {}, Cth = {}% / {}% / {}%".format(round(self.getSpeed()), self.getDamage(), round(self.getRange()/1000000), round(self.getFuel(), self._dispPrec), self.getMr(), round(self.getCth(3000), self._dispPrec), round(self.getCth(5000), self._dispPrec), round(self.getCth(10000), self._dispPrec))
+    performanceStr = "  Speed = {} km/s ({} km/s), Damage = {}, Range = {} mkm, Fuel = {}, MR = {}, Cth = {}% / {}% / {}%".format(self.getRoundedSpeed(), round(self.getSpeed(), self._dispPrec), self.getDamage(), round(self.getRange()/1000000), round(self.getFuel(), self._dispPrec), self.getMr(), round(self.getCth(3000), self._dispPrec), round(self.getCth(5000), self._dispPrec), round(self.getCth(10000), self._dispPrec))
     engineStr = "  missile engine: {}".format(self.engineSetup)
     finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr
     return finalStr
-    
+
   def getSize(self):
     size = self.warheadMsp + self.engineSetup.getTotalEngineMsp() + self.fuelMsp + self.agilityMsp + self.excessMsp
     return round(size, self._prec)
@@ -135,7 +139,11 @@ class Missile:
   def getSpeed(self):
     speed = self.engineSetup.getSpeed(self.getSize())
     return round(speed, self._prec)
-  
+
+  def getRoundedSpeed(self):
+    roundedSpeed = self.engineSetup.getRoundedSpeed(self.getSize());
+    return roundedSpeed
+
   def getDamage(self):
     damage = math.floor(self.technologyContext.damagePerMsp*self.warheadMsp)
     return damage
@@ -199,7 +207,7 @@ class MissileOptimization:
             if self._checkEngine(engineSetup):
               engineSetups.append(engineSetup)
     return engineSetups
-  
+
   def _checkMultiplier(self, multiplier):
     if not (self.technologyContext.MinPowerFactor is None or multiplier >= self.technologyContext.MinPowerFactor):
       return False
@@ -208,13 +216,13 @@ class MissileOptimization:
     return True
 
   def _checkEngine(self, engineSetup):
-    speed = engineSetup.getSpeed(self.calculationContext.size)
+    speed = engineSetup.getRoundedSpeed(self.calculationContext.size)
     if not (self.calculationContext.minSpeed is None or speed>=self.calculationContext.minSpeed):
       return False
     if not (self.calculationContext.maxSpeed is None or speed<=self.calculationContext.maxSpeed):
       return False
     return True
-    
+
   def _getAllWarheadMsp(self):
     minDmg = self.calculationContext.minDamage
     maxMsp = self.calculationContext.size - self.calculationContext.minExcessSize
@@ -225,7 +233,6 @@ class MissileOptimization:
       maxDmg = min(damageSteps, self.calculationContext.maxDamage)
     else:
       maxDmg = damageSteps
-    
     minDmgStep = 10*10**(-self._prec)*mspPerDamage
     warheadMsps = [minDmgStep + dmg*mspPerDamage for dmg in range(minDmg, maxDmg+1)]
     return warheadMsps
@@ -266,7 +273,7 @@ class MissileOptimization:
       raise Exception("Size = {} > {}".format(size, calcCtx.size))
     if missile.excessMsp < calcCtx.minExcessSize:
       raise Exception("ExcessMsp = {} < {}".format(missile.excessMsp, calcCtx.minExcessSize))
-    speed = missile.getSpeed()
+    speed = missile.getRoundedSpeed()
     if not calcCtx.minSpeed is None and speed < calcCtx.minSpeed:
       raise Exception("Speed = {} < {}".format(speed, calcCtx.minSpeed))
     if not calcCtx.maxSpeed is None and speed > calcCtx.maxSpeed:
