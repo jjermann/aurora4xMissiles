@@ -74,7 +74,8 @@ class EngineSetup:
     self.nr = nr
     self.multiplier = multiplier
     self.msp = msp
-    self._dispPrec = 4
+    self._dispPrec = 5
+    self._prec = 5
 
     self.ep = self.technologyContext.getEPPerMsp()*self.msp*self.multiplier
     fuelConsumptionBaseModifier = self.technologyContext.fuelConsumption
@@ -98,7 +99,7 @@ class EngineSetup:
     return self.msp*self.nr
 
   def getSpeed(self, totalMsp):
-    return 1000*self.ep*self.nr*20.0/totalMsp
+    return round(1000*self.ep*self.nr*20.0/totalMsp, self._prec)
 
   def getRoundedSpeed(self, totalMsp):
     speed = self.getSpeed(totalMsp)
@@ -122,7 +123,7 @@ class Missile:
     self.engineSetup = engineSetup
     self.agilityMsp = agilityMsp
     self.excessMsp = excessMsp
-    self._dispPrec = 4
+    self._dispPrec = 5
     self._prec = 5
 
   def __repr__(self):
@@ -234,7 +235,7 @@ class MissileOptimization:
     else:
       maxDmg = damageSteps
     minDmgStep = 10*10**(-self._prec)*mspPerDamage
-    warheadMsps = [minDmgStep + dmg*mspPerDamage for dmg in range(minDmg, maxDmg+1)]
+    warheadMsps = [round(minDmgStep + dmg*mspPerDamage, self._prec) for dmg in range(minDmg, maxDmg+1)]
     return warheadMsps
 
   def _getAllMr(self):
@@ -246,7 +247,7 @@ class MissileOptimization:
     initialMspForMr = minAgilityStep + 0.5*self.calculationContext.size/agilityPerMsp
     remainingMsp = maxMsp-initialMspForMr
     mrSteps = math.floor(remainingMsp / mspPerMr)
-    agilityMsps = [0] + [initialMspForMr + k*mspPerMr for k in range(0, mrSteps+1)]
+    agilityMsps = [0] + [round(initialMspForMr + k*mspPerMr, self._prec) for k in range(0, mrSteps+1)]
     return agilityMsps
 
   def getAllMissiles(self):

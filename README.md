@@ -51,27 +51,27 @@ print(topMissiles)
 gives:
 
 ```
-244 candidates:
+246 candidates:
 
 Size = 12.0: WH = 4.05, Fuel = 1.5324, Agility = 0.7876, Engine = 4.63, Excess = 1.0
-  Speed = 50158 km/s, Damage = 81, Range = 2001 mkm, Fuel = 3830.9375, MR = 21, Cth = 351.1083% / 210.665% / 105.3325%
-  missile engine: EP = 30.095, MSP = 4.63, multiplier = 2.6, Fuel/EPH = 11.4878, Fuel/Hour = 345.7263
+  Speed = 50200 km/s (50158.33333 km/s), Damage = 81, Range = 2001 mkm, Fuel = 3831.0, MR = 21, Cth = 351.10833% / 210.665% / 105.3325%
+  missile engine: EP = 30.095, MSP = 4.63, multiplier = 2.6, Fuel/EPH = 11.48783, Fuel/Hour = 345.7263
 
 Size = 12.0: WH = 4.05, Fuel = 1.4424, Agility = 0.7876, Engine = 4.72, Excess = 1.0
-  Speed = 50150 km/s, Damage = 81, Range = 2003 mkm, Fuel = 3605.9375, MR = 21, Cth = 351.05% / 210.63% / 105.315%
-  missile engine: EP = 30.09, MSP = 4.72, multiplier = 2.55, Fuel/EPH = 10.8005, Fuel/Hour = 324.9876
+  Speed = 50200 km/s (50150.0 km/s), Damage = 81, Range = 2003 mkm, Fuel = 3606.0, MR = 21, Cth = 351.05% / 210.63% / 105.315%
+  missile engine: EP = 30.09, MSP = 4.72, multiplier = 2.55, Fuel/EPH = 10.80052, Fuel/Hour = 324.98758
 
 Size = 12.0: WH = 4.05, Fuel = 1.5424, Agility = 0.7876, Engine = 4.62, Excess = 1.0
-  Speed = 50050 km/s, Damage = 81, Range = 2011 mkm, Fuel = 3855.9375, MR = 21, Cth = 350.35% / 210.21% / 105.105%
-  missile engine: EP = 30.03, MSP = 4.62, multiplier = 2.6, Fuel/EPH = 11.5048, Fuel/Hour = 345.4894
+  Speed = 50000 km/s (50050.0 km/s), Damage = 81, Range = 2011 mkm, Fuel = 3856.0, MR = 21, Cth = 350.35% / 210.21% / 105.105%
+  missile engine: EP = 30.03, MSP = 4.62, multiplier = 2.6, Fuel/EPH = 11.50481, Fuel/Hour = 345.48941
 
 Size = 12.0: WH = 4.05, Fuel = 1.4524, Agility = 0.7876, Engine = 4.71, Excess = 1.0
-  Speed = 50044 km/s, Damage = 81, Range = 2014 mkm, Fuel = 3630.9375, MR = 21, Cth = 350.3062% / 210.1838% / 105.0919%
-  missile engine: EP = 30.0262, MSP = 4.71, multiplier = 2.55, Fuel/EPH = 10.8162, Fuel/Hour = 324.7692
+  Speed = 50000 km/s (50043.75 km/s), Damage = 81, Range = 2014 mkm, Fuel = 3631.0, MR = 21, Cth = 350.30625% / 210.18375% / 105.09187%
+  missile engine: EP = 30.02625, MSP = 4.71, multiplier = 2.55, Fuel/EPH = 10.81617, Fuel/Hour = 324.76916
 
 Size = 12.0: WH = 4.05, Fuel = 1.6324, Agility = 0.7876, Engine = 4.53, Excess = 1.0
-  Speed = 50019 km/s, Damage = 81, Range = 2002 mkm, Fuel = 4080.9375, MR = 21, Cth = 350.1313% / 210.0788% / 105.0394%
-  missile engine: EP = 30.0113, MSP = 4.53, multiplier = 2.65, Fuel/EPH = 12.2291, Fuel/Hour = 367.012
+  Speed = 50000 km/s (50018.75 km/s), Damage = 81, Range = 2002 mkm, Fuel = 4081.0, MR = 21, Cth = 350.13125% / 210.07875% / 105.03938%
+  missile engine: EP = 30.01125, MSP = 4.53, multiplier = 2.65, Fuel/EPH = 12.22915, Fuel/Hour = 367.01195
 ```
 
 The final candidates can be sorted according to any missile criteria
