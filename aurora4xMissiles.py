@@ -290,7 +290,7 @@ class MissileOptimization:
     return True
 
   def _dmgCthSort(self, missile):
-    return (missile.getDamage(), missile.getCth(10000))
+    return (missile.getDamage(), missile.getCth(self.calculationContext.intendedTargetSpeed))
 
   def getTopMissiles(self, sortFn = None, reverse=True, top=5):
     if (sortFn is None):
