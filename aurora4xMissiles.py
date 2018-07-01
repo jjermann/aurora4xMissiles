@@ -299,19 +299,21 @@ class MissileOptimization:
     sortedMissiles = sorted(allMissiles, key=sortFn, reverse=reverse)
     return sortedMissiles[:top]
 
-  def printTopMissiles(self, sortFn = None, reverse=True, top=5, infoFn = None):
+  def printTopMissiles(self, sortFn = None, reverse=True, top=5, infoFn = None, reprFn = None):
     if (sortFn is None):
       sortFn = self._dmgCthSort
     candidates = len(self.getAllMissiles())
     topMissiles = self.getTopMissiles(sortFn=sortFn, reverse=reverse, top=top)
     outputStr = "{} candidates:\n\n".format(candidates)
     for m in topMissiles:
-      if infoFn is None:
-        info = ""
+      if reprFn is None:
+        if infoFn is None:
+          info = ""
+        else:
+          info = "  {}\n".format(infoFn(m))
+        outputStr += "{}{}\n".format(m, info)
       else:
-        info = "  {}\n".format(infoFn(m))
-        
-      outputStr += "{}{}\n".format(m, info)
+        outputStr += "{}\n".format(reprFn(m))
     return outputStr
 
 
@@ -340,7 +342,7 @@ def getExampleOptimizer():
   calcContext.size = 12
   calcContext.minExcessSize = 1.0
   calcContext.minDamage = 80
-  calcContext.maxDamage = 81
+  calcContext.maxDamage = 82
   calcContext.minSpeed = 50000
   calcContext.maxSpeed = 1000000
   calcContext.minRange = 2000000000
