@@ -130,7 +130,7 @@ class Missile:
     sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp, self._dispPrec), round(self.fuelMsp, self._dispPrec), round(self.agilityMsp, self._dispPrec), round(self.engineSetup.getTotalEngineMsp(), self._dispPrec), self.excessMsp)
     performanceStr = "  Speed = {} km/s ({} km/s), Damage = {}, Range = {} mkm, Fuel = {}, MR = {}, Cth = {}% / {}% / {}%".format(self.getRoundedSpeed(), round(self.getSpeed(), self._dispPrec), self.getDamage(), round(self.getRange()/1000000), round(self.getFuel(), self._dispPrec), self.getMr(), round(self.getCth(3000), self._dispPrec), round(self.getCth(5000), self._dispPrec), round(self.getCth(10000), self._dispPrec))
     engineStr = "  missile engine: {}".format(self.engineSetup)
-    finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr
+    finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr + "\n"
     return finalStr
 
   def getSize(self):
@@ -299,16 +299,20 @@ class MissileOptimization:
     sortedMissiles = sorted(allMissiles, key=sortFn, reverse=reverse)
     return sortedMissiles[:top]
 
-  def printTopMissiles(self, sortFn = None, reverse=True, top=5):
+  def printTopMissiles(self, sortFn = None, reverse=True, top=5, infoFn = None):
     if (sortFn is None):
       sortFn = self._dmgCthSort
     candidates = len(self.getAllMissiles())
     topMissiles = self.getTopMissiles(sortFn=sortFn, reverse=reverse, top=top)
     outputStr = "{} candidates:\n\n".format(candidates)
     for m in topMissiles:
-      outputStr += "{}\n\n".format(m)
+      if infoFn is None:
+        info = ""
+      else:
+        info = "  {}\n".format(infoFn(m))
+        
+      outputStr += "{}{}\n".format(m, info)
     return outputStr
-
 
 
 # EXAMPLE
@@ -324,6 +328,8 @@ def getExampleOptimizer():
   techContext.MaxPowerFactor = 6
 
   calcContext = CalculationContext()
+  calcContext.intendedTargetSpeed = 10000
+  calcContext.maxNr = 1
   #calcContext.size = 1
   #calcContext.minDamage = 1
   #calcContext.maxDamage = 1
@@ -346,8 +352,8 @@ def getExampleOptimizer():
 example = getExampleOptimizer()
 print(example)
 
-#In case missiles should be sorted by chance to hit (descending):
-#topMissiles = example.printTopMissiles(lambda m:m.getCth(10000))
+#In case missiles should be sorted by chance to hit (descending), including an infoFn:
+#topMissiles = example.printTopMissiles(sortFn = lambda m:m.getCth(100000), infoFn = lambda m: "Cth = {}".format(m.getCth(100000)))
 #In case missiles should be sorted by damage
 topMissiles = example.printTopMissiles()
 print(topMissiles)
