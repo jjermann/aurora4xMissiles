@@ -6,39 +6,41 @@ class AuroraData:
   def __init__(self):
     self.agilityTech = [20, 32, 48, 64, 80, 100, 128, 160, 200, 240, 320, 400]
     self.warheadTech = {
-      "Gun-Type Fission"            : 2.0,
-      "Implosion Fission"           : 3.0,
-      "Levitated-pit Implosion"     : 4.0,
-      "Fusion-boosted Fission"      : 5.0,
-      "Two-stage Thermonuclear"     : 6.0,
-      "Three-stage Thermonuclear"   : 8.0,
-      "Cobalt"                      : 10.0,
-      "Tri-Cobalt"                  : 12.0,
-      "Antimatter Catalyzed Cobalt" : 16.0,
-      "Antimatter"                  : 20.0,
-      "Advanced Antimatter"         : 24.0,
-      "Gravitonic"                  : 30.0
+      "Gun-Type Fission"                  : 2.0,
+      "Implosion Fission"                 : 3.0,
+      "Levitated-pit Implosion"           : 4.0,
+      "Fusion-boosted Fission"            : 5.0,
+      "Two-stage Thermonuclear"           : 6.0,
+      "Three-stage Thermonuclear"         : 8.0,
+      "Cobalt"                            : 10.0,
+      "Tri-Cobalt"                        : 12.0,
+      "Antimatter Catalyzed Cobalt"       : 16.0,
+      "Antimatter"                        : 20.0,
+      "Advanced Antimatter"               : 24.0,
+      "Gravitonic"                        : 30.0
     }
     self.engineTech = {
-      "Conventional"                : 0.2,
-      "Nuclear Thermal"             : 5.0,
-      "Nuclear Pulse"               : 8.0,
-      "Ion"                         : 12.0,
-      "Magneto-Plasma"              : 16.0,
-      "Internal Confinement Fusion" : 20.0,
-      "Magnetic Confinement Fusion" : 25.0,
-      "Inertial Confinement Fusion" : 32.0,
-      "Solid-core Anti-matter"      : 40.0,
-      "Gas-core Anti-matter"        : 50.0,
-      "Plasma-core Anti-matter"     : 60.0,
-      "Beam-core Anti-matter"       : 80.0,
-      "Photonic Drive"              : 100.0
+      "Conventional Engine"               : 0.1,
+      "Nuclear Thermal Engine"            : 5.0,
+      "Improved Nuclear Thermal Engine"   : 6.4,
+      "Nuclear Pulse Engine"              : 8.0,
+      "Improved Nuclear Pulse Engine"     : 10.0,
+      "Ion Drive"                         : 12.5,
+      "Magneto-plasma Drive"              : 16.0,
+      "Internal Confinement Fusion Drive" : 20.0,
+      "Magnetic Confinement Fusion Drive" : 25.0,
+      "Inertial Confinement Fusion Drive" : 32.0,
+      "Solid-core Anti-matter Drive"      : 40.0,
+      "Gas-core Anti-matter Drive"        : 50.0,
+      "Plasma-core Anti-matter Drive"     : 64.0,
+      "Beam-core Anti-matter Drive"       : 80.0,
+      "Photonic Drive"                    : 100.0
     }
     self.fuelConsumptionTech = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.16, 0.125, 0.1]
     self.minMultiplierTech = [0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1]
     self.maxMultiplierTech = [1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]
     self.engineMultipliers = [ intm*1.0/20 for intm in range(2, 121) ]
-    self.engineMsps = [ intmsp*1.0/100 for intmsp in range(10, 500) ]
+    self.engineMsps = [ intmsp*1.0/100 for intmsp in range(10, 300) ] + [ intmsp*1.0/100 for intmsp in range(300, 1000, 10) ] + [ intmsp*1.0/100 for intmsp in range(1000, 5050, 50) ]
 
 
 class TechnologyContext:
@@ -47,11 +49,14 @@ class TechnologyContext:
     self.agilityPerMsp = 160
     self.EPPerHs = 50
     self.fuelConsumption = 0.2
-    self.MinPowerFactor = 0.1
-    self.MaxPowerFactor = 6
+    self.minPowerFactor = 0.1
+    self.maxPowerFactor = 6
 
   def getEPPerMsp(self):
     return self.EPPerHs/20.0
+
+  def setEPPerMsp(self, epPerMsp):
+    self.EPPerHs = epPerMsp*20.0
 
 
 class CalculationContext:
@@ -62,10 +67,11 @@ class CalculationContext:
     self.minCth = 0
     self.minSpeed = None
     self.maxSpeed = None
-    self.maxNr = 1
     self.minRange = 0
     self.minDamage = 0
     self.maxDamage = None
+    #obsolete (leave as 1)
+    self.maxNr = 1
 
 
 class EngineSetup:
@@ -77,11 +83,26 @@ class EngineSetup:
     self._dispPrec = 5
     self._prec = 5
 
-    self.ep = self.technologyContext.getEPPerMsp()*self.msp*self.multiplier
+    epInternal = self.technologyContext.getEPPerMsp()*self.msp*self.multiplier
     fuelConsumptionBaseModifier = self.technologyContext.fuelConsumption
-    fuelConsumptionSizeModifier = 1.0/((self.msp/5.0)**0.683)
-    fuelConsumptionMultiplierModifier = self.multiplier**2.5
-    self.fuelPerEPH = 5.0*fuelConsumptionBaseModifier*fuelConsumptionSizeModifier*fuelConsumptionMultiplierModifier
+    fuelConsumptionSizeModifier = self.getFuelConsumptionSizeModifier()
+    fuelConsumptionMultiplierModifier = self.getFuelConsumptionMultiplierModifier()
+    fuelEfficiency = fuelConsumptionBaseModifier*fuelConsumptionSizeModifier*fuelConsumptionMultiplierModifier
+    self.ep = round(epInternal, 2)
+    # Remark: "Fuel per EPH" in the missile designer is = self.ep*self.fuelPerEPH, shouldn't that be "Fuel per Hour"?
+    self.fuelPerEPH = fuelEfficiency
+
+  def getFuelConsumptionSizeModifier(self):
+    fuelConsumptionSizeModifier = math.sqrt(200.0/self.msp)
+    return fuelConsumptionSizeModifier
+
+  def getFuelConsumptionMultiplierModifier(self):
+    if self.multiplier > self.technologyContext.maxPowerFactor:
+      highBoostModifier = (self.multiplier - self.technologyContext.maxPowerFactor) * 4.0 / self.technologyContext.maxPowerFactor + 1.0
+    else:
+      highBoostModifier = 1.0
+    fuelConsumptionMultiplierModifier = highBoostModifier * self.multiplier**2.5
+    return fuelConsumptionMultiplierModifier
 
   def getFuelPerHour(self):
     return self.fuelPerEPH*self.ep
@@ -93,7 +114,13 @@ class EngineSetup:
     nr = ""
     if self.nr > 1:
       nr = "{} x ".format(self.nr)
-    return "{}EP = {}, MSP = {}, multiplier = {}, Fuel/EPH = {}, Fuel/Hour = {}".format(nr, round(self.ep, self._dispPrec), round(self.msp, self._dispPrec), round(self.multiplier, self._dispPrec), round(self.fuelPerEPH, self._dispPrec), round(self.getFuelPerHour(), self._dispPrec))
+    return "{}EP = {}, MSP = {}, multiplier = {}, Fuel/EPH = {}, Fuel/Hour = {}".format(
+      nr,
+      round(self.ep, self._dispPrec),
+      round(self.msp, self._dispPrec),
+      round(self.multiplier, self._dispPrec),
+      round(self.fuelPerEPH, self._dispPrec),
+      round(self.getFuelPerHour(), self._dispPrec))
 
   def getTotalEngineMsp(self):
     return self.msp*self.nr
@@ -127,11 +154,21 @@ class Missile:
     self._prec = 5
 
   def __repr__(self):
-    sizeStr = "Size = {}: WH = {}, Fuel = {}, Agility = {}, Engine = {}, Excess = {}".format(self.getSize(), round(self.warheadMsp, self._dispPrec), round(self.fuelMsp, self._dispPrec), round(self.agilityMsp, self._dispPrec), round(self.engineSetup.getTotalEngineMsp(), self._dispPrec), self.excessMsp)
-    performanceStr = "  Speed = {} km/s ({} km/s), Damage = {}, Range = {} mkm, Fuel = {}, MR = {}, Cth = {}% / {}% / {}%".format(self.getRoundedSpeed(), round(self.getSpeed(), self._dispPrec), self.getDamage(), round(self.getRange()/1000000), round(self.getFuel(), self._dispPrec), self.getMr(), round(self.getCth(3000), self._dispPrec), round(self.getCth(5000), self._dispPrec), round(self.getCth(10000), self._dispPrec))
-    engineStr = "  missile engine: {}".format(self.engineSetup)
-    finalStr = sizeStr + "\n" + performanceStr + "\n" + engineStr + "\n"
-    return finalStr
+    return self.getInputDataRepresentation() + '\n' + self.getMissileRepresentation() + '\n'
+
+  def getInputDataRepresentation(self):
+    inputDataRepresentation = f'Size = {self.getSize()}: WH MSP = {round(self.warheadMsp, self._dispPrec)}, Fuel MSP = {round(self.fuelMsp, self._dispPrec)}, Agility MSP = {round(self.agilityMsp, self._dispPrec)}, Excess MSP = {self.excessMsp}, Engine Power Modifier = {round(self.engineSetup.multiplier*100)}%, Engine Size MSP = {round(self.engineSetup.getTotalEngineMsp(), self._dispPrec)}'
+    return inputDataRepresentation
+
+  def getMissileRepresentation(self):
+    missileRepresentation = f'Damage = {self.getDamage()}, EP = {round(self.engineSetup.ep, self._dispPrec)}, Speed = {round(self.getSpeed(), self._dispPrec)} km/s, Range = {round(self.getRange()/1000000, self._dispPrec)}m km, MR = {self.getMr()}, Cth = {round(self.getCth(3000), self._dispPrec)}% / {round(self.getCth(5000), self._dispPrec)}% / {round(self.getCth(10000), self._dispPrec)}%'
+    return missileRepresentation
+
+  def getGameMissileRepresentation(self):
+    gameMissileRepresentation = f'Missile Size: {self.getSize()} MSP  ({self.getSize()*5.0} Tons)     Warhead: {round(self.warheadMsp, self._dispPrec)}    Manoeuvre Rating: {self.getMr()}\n'
+    gameMissileRepresentation += f'Speed: {round(self.getSpeed(), self._dispPrec)} km/s     Fuel: {round(self.getFuel(), self._dispPrec)}     Flight Time: {round(self.getFlightTime()/60.0)} minutes     Range: {round(self.getRange()/1000000), self._dispPrec}m km\n'
+    gameMissileRepresentation += f'Chance to Hit: 1k km/s {round(self.getCth(1000), self._dispPrec)}%   3k km/s {round(self.getCth(3000), self._dispPrec)}%   5k km/s {round(self.getCth(5000), self._dispPrec)}%   10k km/s {round(self.getCth(10000), self._dispPrec)}%\n'
+    return gameMissileRepresentation
 
   def getSize(self):
     size = self.warheadMsp + self.engineSetup.getTotalEngineMsp() + self.fuelMsp + self.agilityMsp + self.excessMsp
@@ -156,6 +193,10 @@ class Missile:
   def getRange(self):
     range = self.getFuel()*self.getSpeed()*1.0/self.engineSetup.getTotalFuelPerSecond()
     return round(range, self._prec)
+
+  def getFlightTime(self):
+    flightTimeInSeconds = self.getFuel()*1.0/self.engineSetup.getTotalFuelPerSecond()
+    return flightTimeInSeconds
 
   def getMr(self):
     mr = 10 + round(self.technologyContext.agilityPerMsp*self.agilityMsp/self.getSize())
@@ -210,10 +251,10 @@ class MissileOptimization:
     return engineSetups
 
   def _checkMultiplier(self, multiplier):
-    if not (self.technologyContext.MinPowerFactor is None or multiplier >= self.technologyContext.MinPowerFactor):
+    if not (self.technologyContext.minPowerFactor is None or multiplier >= self.technologyContext.minPowerFactor):
       return False
-    if not (self.technologyContext.MaxPowerFactor is None or multiplier <= self.technologyContext.MaxPowerFactor*2.0):
-      return False
+    # if not (self.technologyContext.maxPowerFactor is None or multiplier <= self.technologyContext.maxPowerFactor):
+    #   return False
     return True
 
   def _checkEngine(self, engineSetup):
@@ -234,8 +275,9 @@ class MissileOptimization:
       maxDmg = min(damageSteps, self.calculationContext.maxDamage)
     else:
       maxDmg = damageSteps
-    minDmgStep = 10*10**(-self._prec)*mspPerDamage
-    warheadMsps = [round(minDmgStep + dmg*mspPerDamage, self._prec) for dmg in range(minDmg, maxDmg+1)]
+    # minDmgStep = 10*10**(-self._prec)*mspPerDamage
+    # warheadMsps = [round(minDmgStep + dmg*mspPerDamage, self._prec) for dmg in range(minDmg, maxDmg+1)]
+    warheadMsps = [math.ceil(dmg*mspPerDamage*10**self._prec)*1.0/(10**self._prec) for dmg in range(minDmg, maxDmg+1)]
     return warheadMsps
 
   def _getAllMr(self):
@@ -322,31 +364,32 @@ class MissileOptimization:
 def getExampleOptimizer():
   auroraData = AuroraData()
   techContext = TechnologyContext()
-  techContext.damagePerMsp = 20
-  techContext.agilityPerMsp = 160
-  techContext.EPPerHs = 50
-  techContext.fuelConsumption = 0.2
-  techContext.MinPowerFactor = 0.1
-  techContext.MaxPowerFactor = 6
+  techContext.damagePerMsp = 6
+  techContext.agilityPerMsp = 48
+  techContext.setEPPerMsp(0.32)
+  techContext.fuelConsumption = 0.3
+  techContext.minPowerFactor = 0.25
+  techContext.maxPowerFactor = 3
 
   calcContext = CalculationContext()
-  calcContext.intendedTargetSpeed = 10000
-  calcContext.maxNr = 1
-  #calcContext.size = 1
-  #calcContext.minDamage = 1
-  #calcContext.maxDamage = 1
-  #calcContext.minSpeed = 50000
-  #calcContext.maxSpeed = 1000000
-  #calcContext.minRange = 20000000
-  #calcContext.minCth = 1000
+  calcContext.intendedTargetSpeed = 5000
+
   calcContext.size = 12
   calcContext.minExcessSize = 1.0
-  calcContext.minDamage = 80
-  calcContext.maxDamage = 82
-  calcContext.minSpeed = 50000
-  calcContext.maxSpeed = 1000000
-  calcContext.minRange = 2000000000
-  calcContext.minCth = 100
+  calcContext.minDamage = 13
+  calcContext.maxDamage = 14
+  calcContext.minSpeed = 10000
+  calcContext.maxSpeed = 20000
+  calcContext.minRange = 100000000
+  calcContext.minCth = 30
+
+  # calcContext.size = 1
+  # calcContext.minDamage = 1
+  # calcContext.maxDamage = 1
+  # calcContext.minSpeed = 10000
+  # calcContext.maxSpeed = 20000
+  # calcContext.minRange = 100000
+  # calcContext.minCth = 100
 
   missileOpt = MissileOptimization(auroraData, techContext, calcContext)
   return missileOpt

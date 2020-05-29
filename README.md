@@ -26,8 +26,8 @@ def getExampleOptimizer():
   techContext.agilityPerMsp = 160
   techContext.EPPerHs = 50
   techContext.fuelConsumption = 0.2
-  techContext.MinPowerFactor = 0.1
-  techContext.MaxPowerFactor = 6
+  techContext.minPowerFactor = 0.1
+  techContext.maxPowerFactor = 6
 
   calcContext = CalculationContext()
   calcContext.size = 12
