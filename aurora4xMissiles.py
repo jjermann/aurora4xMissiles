@@ -373,7 +373,6 @@ def getExampleOptimizer():
 
   calcContext = CalculationContext()
   calcContext.intendedTargetSpeed = 5000
-
   calcContext.size = 12
   calcContext.minExcessSize = 1.0
   calcContext.minDamage = 13
@@ -383,6 +382,7 @@ def getExampleOptimizer():
   calcContext.minRange = 100000000
   calcContext.minCth = 30
 
+  # calcContext.intendedTargetSpeed = 5000
   # calcContext.size = 1
   # calcContext.minDamage = 1
   # calcContext.maxDamage = 1

@@ -1,5 +1,5 @@
 # aurora4xMissiles
-Aurora4x missile optimizer
+AuroraC# missile optimizer
 
 The optimizer will try to find all possible missile designs satisfying the
 given restrictions. It is quite slow unless the number of choices is reduced
@@ -22,26 +22,26 @@ Example:
 def getExampleOptimizer():
   auroraData = AuroraData()
   techContext = TechnologyContext()
-  techContext.damagePerMsp = 20
-  techContext.agilityPerMsp = 160
-  techContext.EPPerHs = 50
-  techContext.fuelConsumption = 0.2
-  techContext.minPowerFactor = 0.1
-  techContext.maxPowerFactor = 6
+  techContext.damagePerMsp = 6
+  techContext.agilityPerMsp = 48
+  techContext.setEPPerMsp(0.32)
+  techContext.fuelConsumption = 0.3
+  techContext.minPowerFactor = 0.25
+  techContext.maxPowerFactor = 3
 
   calcContext = CalculationContext()
+  calcContext.intendedTargetSpeed = 5000
   calcContext.size = 12
   calcContext.minExcessSize = 1.0
-  calcContext.minDamage = 80
-  calcContext.maxDamage = 81
-  calcContext.minSpeed = 50000
-  calcContext.maxSpeed = 1000000
-  calcContext.minRange = 2000000000
-  calcContext.minCth = 100
+  calcContext.minDamage = 23
+  calcContext.maxDamage = 27
+  calcContext.minSpeed = 10000
+  calcContext.maxSpeed = 20000
+  calcContext.minRange = 100000000
+  calcContext.minCth = 30
 
   missileOpt = MissileOptimization(auroraData, techContext, calcContext)
   return missileOpt
-
 
 example = getExampleOptimizer()
 topMissiles = example.printTopMissiles()
@@ -53,25 +53,20 @@ gives:
 ```
 246 candidates:
 
-Size = 12.0: WH = 4.05, Fuel = 1.5324, Agility = 0.7876, Engine = 4.63, Excess = 1.0
-  Speed = 50200 km/s (50158.33333 km/s), Damage = 81, Range = 2001 mkm, Fuel = 3831.0, MR = 21, Cth = 351.10833% / 210.665% / 105.3325%
-  missile engine: EP = 30.095, MSP = 4.63, multiplier = 2.6, Fuel/EPH = 11.48783, Fuel/Hour = 345.7263
+Size = 12.0: WH MSP = 4.1667, Fuel MSP = 0.908, Agility MSP = 1.1253, Excess MSP = 1.0, Engine Power Modifier = 395%, Engine Size MSP = 4.8
+Damage = 25, EP = 6.07, Speed = 10116.66667 km/s, Range = 100.06474m km, MR = 15, Cth = 50.58333% / 30.35% / 15.175%
 
-Size = 12.0: WH = 4.05, Fuel = 1.4424, Agility = 0.7876, Engine = 4.72, Excess = 1.0
-  Speed = 50200 km/s (50150.0 km/s), Damage = 81, Range = 2003 mkm, Fuel = 3606.0, MR = 21, Cth = 351.05% / 210.63% / 105.315%
-  missile engine: EP = 30.09, MSP = 4.72, multiplier = 2.55, Fuel/EPH = 10.80052, Fuel/Hour = 324.98758
+Size = 12.0: WH MSP = 4.1667, Fuel MSP = 1.108, Agility MSP = 1.1253, Excess MSP = 1.0, Engine Power Modifier = 410%, Engine Size MSP = 4.6
+Damage = 25, EP = 6.04, Speed = 10066.66667 km/s, Range = 100.06993m km, MR = 15, Cth = 50.33333% / 30.2% / 15.1%
 
-Size = 12.0: WH = 4.05, Fuel = 1.5424, Agility = 0.7876, Engine = 4.62, Excess = 1.0
-  Speed = 50000 km/s (50050.0 km/s), Damage = 81, Range = 2011 mkm, Fuel = 3856.0, MR = 21, Cth = 350.35% / 210.21% / 105.105%
-  missile engine: EP = 30.03, MSP = 4.62, multiplier = 2.6, Fuel/EPH = 11.50481, Fuel/Hour = 345.48941
+Size = 12.0: WH MSP = 4.1667, Fuel MSP = 0.808, Agility MSP = 1.1253, Excess MSP = 1.0, Engine Power Modifier = 385%, Engine Size MSP = 4.9
+Damage = 25, EP = 6.04, Speed = 10066.66667 km/s, Range = 101.9187m km, MR = 15, Cth = 50.33333% / 30.2% / 15.1%
 
-Size = 12.0: WH = 4.05, Fuel = 1.4524, Agility = 0.7876, Engine = 4.71, Excess = 1.0
-  Speed = 50000 km/s (50043.75 km/s), Damage = 81, Range = 2014 mkm, Fuel = 3631.0, MR = 21, Cth = 350.30625% / 210.18375% / 105.09187%
-  missile engine: EP = 30.02625, MSP = 4.71, multiplier = 2.55, Fuel/EPH = 10.81617, Fuel/Hour = 324.76916
+Size = 12.0: WH MSP = 4.1667, Fuel MSP = 1.008, Agility MSP = 1.1253, Excess MSP = 1.0, Engine Power Modifier = 400%, Engine Size MSP = 4.7
+Damage = 25, EP = 6.02, Speed = 10033.33333 km/s, Range = 103.47554m km, MR = 15, Cth = 50.16667% / 30.1% / 15.05%
 
-Size = 12.0: WH = 4.05, Fuel = 1.6324, Agility = 0.7876, Engine = 4.53, Excess = 1.0
-  Speed = 50000 km/s (50018.75 km/s), Damage = 81, Range = 2002 mkm, Fuel = 4081.0, MR = 21, Cth = 350.13125% / 210.07875% / 105.03938%
-  missile engine: EP = 30.01125, MSP = 4.53, multiplier = 2.65, Fuel/EPH = 12.22915, Fuel/Hour = 367.01195
+Size = 12.0: WH MSP = 4.1667, Fuel MSP = 0.708, Agility MSP = 1.1253, Excess MSP = 1.0, Engine Power Modifier = 375%, Engine Size MSP = 5.0
+Damage = 25, EP = 6.0, Speed = 10000.0 km/s, Range = 102.7697m km, MR = 15, Cth = 50.0% / 30.0% / 15.0%
 ```
 
 The final candidates can be sorted according to any missile criteria
