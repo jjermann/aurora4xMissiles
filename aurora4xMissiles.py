@@ -253,8 +253,8 @@ class MissileOptimization:
   def _checkMultiplier(self, multiplier):
     if not (self.technologyContext.minPowerFactor is None or multiplier >= self.technologyContext.minPowerFactor):
       return False
-    # if not (self.technologyContext.maxPowerFactor is None or multiplier <= self.technologyContext.maxPowerFactor):
-    #   return False
+    if not (self.technologyContext.maxPowerFactor is None or multiplier <= 2*self.technologyContext.maxPowerFactor):
+      return False
     return True
 
   def _checkEngine(self, engineSetup):
