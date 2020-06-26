@@ -13,10 +13,58 @@ The main optimizer class is `MissileOptimization`. It requires `AuroraData`
 and `CalculationContext` (boundary conditions). The top 5 optimized results 
 then be fetched with the command `missileOptimization.printTopMissiles()`.
 Optionally a sorting parameter can be specified (by default it's damage then cth).
+The first line of each result summarizes the _input_ parameter in the missile designer.
+The second line summarizes how the respective missile performs.
+Optionally a third output line can be specified with the functional parameter `infoFn`.
 
-For more details please see the source code...
 
-Example:
+## CalculationContext
+
+* `intendedTargetSpeed`
+That's the speed used for `minCth`. Remark: This value is of no relevance for the optimization, it's just the intended velocity for `minCth`.
+* `minCth`
+That's the minimal chance to hit for the given `intendedTargetSpeed`.
+* `size`
+That's the desired missile size.
+* `minExcessSize`
+If you want to reserve some space for additional gadgets to put in the missile (e.g. ECM or sensors) then you can reserve it with `minExcessSize`.
+* `minDamage`
+The minimal damage of the missile _(very relevant for optimizer performance)_.
+* `maxDamage`
+The maximal damage of the missile _(very relevant for optimizer performance)_.
+* `minSpeed`
+The minimal speed of the missile in km/s _(relevant for optimizer performance)_.
+* `maxSpeed`
+The maximal speed of the missile in km/s _(relevant for optimizer performance)_.
+* `minRange`
+The minimal range of the missile in km _(relevant for optimizer performance)_.
+* `maxRange`
+The maximal range of the missile in km _(relevant for optimizer performance)_.
+
+
+## Basic step-by-step instruction
+
+0. To use the script you can first open a new repl on https://repl.it (language: `Python`) and just copy the content of [aurora4xMissiles.py](https://raw.githubusercontent.com/jjermann/aurora4xMissiles/master/aurora4xMissiles.py) (which already contains an example) in it then hit `Run`.
+You can then adjust the example for your purposes...
+1. Set `AuroraData` (default) and `TechnologyContext` based on your current game status.
+2. Set the `CalculationContext` and run the `MissileOptimization` with `AuroraData`, `TechnologyContext` and `CalculationContext`, you can print the results with `printTopMissiles()`.
+The initial goal should be to roughly determined the desired damage (ideally a square number).
+To do this first set a very rough calculation context or try to calculate *some* example calculation contexts to get a rough idea what the damage should be.
+If the optimizer is too slow then first try some example ranges for damage to reduce the number of candidates.
+Since we are interested in the damage the default sorting (by damage) should be used (i.e. just `printTopMissiles()`, also see the example below).
+3. In a next step I would suggest to narrow down on the desired `minRange` a bit and maybe already start thinking about very rough `minCth` and `minSpeed`/`maxSpeed` limits.
+We can still use the default sorting here...
+4. Now the more delicate optimizations kick in with the basic question: Do we generally want more speed or a greater chance to hit?
+Now it makes sense to try different sortings and to further narrow down on `minSpeed` and `minCth`.
+For speed based sorting you can use `printTopMissiles(sortFn = lambda m:m.getSpeed())`.
+For `cth` based sorting you can use e.g. `printTopMissiles(sortFn = lambda m:m.getCth(35000), infoFn = lambda m: "Cth = {}".format(m.getCth(35000))`.
+Again note that the precise value of the intended target speed (e.g. `35000`) is of no relevance for the optimization but it is of course of relevance to know (and limit) the chance to hit versus a specific speed.
+In addition I suggest to also try sorting by engine power, it usually gives quite good results for both chance to hit and speed.
+For engine power based sorting you can use `printTopMissiles(sortFn = lambda m:m.engineSetup.ep)`.
+5. At the end you should ideally have narrowed down the candidates to a few hundreds or a few thousands and based on the various top candidates for speed, chance to hit and engine power it's time to pick your favorite missile.
+
+
+## Example:
 
 ```python
 def getExampleOptimizer():
